@@ -3,6 +3,8 @@ Tetris Clone in Java
 
 next block implemented
 
-Keys: `left` `right` `up` `down` `space`
+Keys: `left` `right` `up` `down` `space` `c`
 
-![version 1 screenshot](https://raw.githubusercontent.com/OmkarDev/Tetris-Java/main/Screenshot/Version%201.png)
+`c` for holding the block
+
+![version 2 screenshot](https://raw.githubusercontent.com/OmkarDev/Tetris-Java/main/Screenshot/Version%202.png)
