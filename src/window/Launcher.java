@@ -1,16 +1,35 @@
 package window;
 
+import static window.Statics.TOP_SCORE;
 import static window.Statics.W;
+import static window.Statics.backgroundColor;
+import static window.Statics.blue;
+import static window.Statics.cols;
+import static window.Statics.green;
+import static window.Statics.max_speed;
+import static window.Statics.normal_speed;
+import static window.Statics.orange;
+import static window.Statics.purple;
+import static window.Statics.red;
+import static window.Statics.rows;
+import static window.Statics.skyblue;
+import static window.Statics.speed;
+import static window.Statics.yellow;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -30,27 +49,30 @@ public class Launcher extends Window implements KeyListener {
 	Instant now, later;
 
 	public Block nextBlock;
+	public Block holdingBlock;
 
 	public static int[][] board = new int[20][10];
 
-	public static BufferedImage col1, col2, col3;
-	
-	int normal_speed = 500;
-	int speed = normal_speed;
-	int max_speed = 50;
+	public static BufferedImage frame;
+
+	public static boolean canHold = true;
+
+	Font font;
 
 	public Launcher(int width, int height, String title) {
 		super(width, height, title);
 		try {
-			col1 = ImageIO.read(getClass().getResource("/Blue_Tile.png"));
-			col2 = ImageIO.read(getClass().getResource("/Red_Tile.png"));
-			col3 = ImageIO.read(getClass().getResource("/White_Tile.png"));
-		} catch (IOException e) {
+			frame = ImageIO.read(getClass().getResource("/Frame.png"));
+			font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font.ttf"));
+			font = font.deriveFont(Font.BOLD, 30);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		now = Instant.now();
 		nextBlock = getRandomBlock();
 		getNewBlock();
+
+		TOP_SCORE = getScore();
 	}
 
 	public Block getRandomBlock() {
@@ -66,14 +88,15 @@ public class Launcher extends Window implements KeyListener {
 	}
 
 	int randomRange(int min, int max) {
-		return (int) (Math.floor(Math.random() * (max - min + 1)) + min);
+		Random random = new Random();
+		int number = random.nextInt(7);
+		return number;
 	}
 
 	public void getNewBlock() {
 		block = nextBlock;
 		nextBlock = getRandomBlock();
 	}
-
 
 	public void update() {
 		later = Instant.now();
@@ -84,19 +107,38 @@ public class Launcher extends Window implements KeyListener {
 	}
 
 	public void render(Graphics2D g) {
-		g.setColor(Color.lightGray);
-		g.fillRect(0, 0, getWidth(), getHeight());
-		g.setColor(Color.black);
-		g.fillRect(10 - 1, 10, 10 * W + 3, 20 * W + 2);
-		block.render(g, 10, 10);
-		renderBoard(g, 10, 10);
-//		drawGrid(g, 10, 10);
-		nextBlock(g, 250, 20);
+		int x = W * 9 + W / 2 - 2;
+		int y = W * 2;
+		g.drawImage(frame, 0, 0, null);
+		drawGrid(g, x, y);
+		block.render(g, x, y);
+		nextBlock(g, 480, 25 * 5 - 20);
+		holdingBlock(g, 480, 25 * 17);
+		renderBoard(g, x, y);
+
+		g.setColor(Color.white);
+		g.setFont(font);
+		g.drawString(String.format("%8d", Statics.SCORE), 29, 90 + g.getFontMetrics().getHeight());
+		g.drawString(String.format("%8d", Statics.TOP_SCORE), 29, 214 + g.getFontMetrics().getHeight());
+	}
+
+	private void holdingBlock(Graphics2D g, int x, int y) {
+		if (holdingBlock != null) {
+			holdingBlock.render(g, x, y + W / 2);
+		}
+	}
+
+	private void drawGrid(Graphics2D g, int x, int y) {
+		g.setColor(backgroundColor);
+		for (int i = 0; i <= rows; i++) {
+			g.drawLine(0 + x, i * W + y, cols * W + x, i * W + y);
+		}
+		for (int i = 0; i <= cols; i++) {
+			g.drawLine(i * W + x, y, i * W + x, rows * W + y);
+		}
 	}
 
 	public void nextBlock(Graphics2D g, int x, int y) {
-		g.setColor(Color.black);
-		g.fillRect(x + W * 3, 10, W * 6, W * 4);
 		nextBlock.render(g, x, y + W / 2);
 	}
 
@@ -104,36 +146,32 @@ public class Launcher extends Window implements KeyListener {
 		for (int j = 0; j < 20; j++) {
 			for (int i = 0; i < 10; i++) {
 				int type = board[j][i];
-				BufferedImage img;
+				Color col;
 				if (type == 1) {
-					img = col1;
+					col = green;
 				} else if (type == 2) {
-					img = col2;
+					col = red;
 				} else if (type == 3) {
-					img = col3;
+					col = skyblue;
+				} else if (type == 4) {
+					col = blue;
+				} else if (type == 5) {
+					col = orange;
+				} else if (type == 6) {
+					col = purple;
+				} else if (type == 7) {
+					col = yellow;
 				} else {
 					continue;
 				}
-				g.drawImage(img, i * W + x, j * W + y, W, W, null);
-				g.setColor(Color.black);
-				g.drawRect(i * W + x, j * W + y, W, W);
+				g.setColor(col);
+				g.fillRect(i * W + x, j * W + y, W + 1, W + 1);
 			}
 		}
 	}
 
-//	private void drawGrid(Graphics2D g, int x, int y) {
-//		g.setColor(Color.black);
-//		g.setStroke(new BasicStroke(1.5f));
-//		for (int i = 0; i <= rows; i++) {
-//			g.drawLine(0 + x, i * W + y, cols * W + x, i * W + y);
-//		}
-//		for (int i = 0; i <= cols; i++) {
-//			g.drawLine(i * W + x, y, i * W + x, rows * W + y);
-//		}
-//	}
-
 	public static void main(String[] args) {
-		Launcher game = new Launcher(10 * W * 2 + 10, 20 * W + 30, "Tetris");
+		Launcher game = new Launcher(720, 600, "Tetris");
 		game.addKeyListener(game);
 		game.display();
 	}
@@ -151,6 +189,25 @@ public class Launcher extends Window implements KeyListener {
 		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			speed = max_speed;
 		}
+		if (e.getKeyCode() == KeyEvent.VK_C) {
+			if (holdingBlock == null) {
+				Block currentBlock = block;
+				currentBlock.reset();
+				holdingBlock = currentBlock;
+				block = nextBlock;
+				nextBlock = getRandomBlock();
+				canHold = false;
+				return;
+			} else {
+				if (canHold) {
+					Block currentBlock = block;
+					currentBlock.reset();
+					block = holdingBlock;
+					holdingBlock = currentBlock;
+					canHold = false;
+				}
+			}
+		}
 
 	}
 
@@ -162,6 +219,39 @@ public class Launcher extends Window implements KeyListener {
 
 	public void keyTyped(KeyEvent e) {
 
+	}
+
+	public static void writeScore() {
+		try {
+			File file = new File("top.txt");
+			FileWriter myWriter = new FileWriter(file);
+			myWriter.write(Integer.toString(TOP_SCORE));
+			myWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public int getScore() {
+		int score = 0;
+		File file = new File("top.txt");
+		if(!file.exists()) {
+			try {
+				file.createNewFile();
+				TOP_SCORE = 0;
+				writeScore();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try {
+			Scanner myReader = new Scanner(file);
+			score = myReader.nextInt();
+			myReader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return score;
 	}
 
 }

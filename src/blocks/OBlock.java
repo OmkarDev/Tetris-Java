@@ -4,13 +4,18 @@ import window.Launcher;
 
 public class OBlock extends Block {
 
+	final int[][] original_struct = { { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 0, 0, 0 } };
+
 	public OBlock(Launcher game) {
-		super(game,"O");
-		int[][] struct = { { 0, 1, 1, 0}, { 0, 1, 1, 0}, { 0, 0, 0, 0}};
-		this.struct = struct;
+		super(game, "O");
+		this.struct = this.original_struct;
 	}
 
 	public void rotate() {
 	}
-
+	
+	int[][] getOriginalStruct() {
+		return original_struct;
+	}
+	
 }

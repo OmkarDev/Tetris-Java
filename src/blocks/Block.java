@@ -1,45 +1,74 @@
 package blocks;
 
+import static window.Statics.SCORE;
+import static window.Statics.TOP_SCORE;
 import static window.Statics.W;
+import static window.Statics.blue;
 import static window.Statics.cols;
+import static window.Statics.green;
+import static window.Statics.line1;
+import static window.Statics.line2;
+import static window.Statics.line3;
+import static window.Statics.line4;
+import static window.Statics.orange;
+import static window.Statics.purple;
+import static window.Statics.red;
 import static window.Statics.rows;
+import static window.Statics.skyblue;
+import static window.Statics.yellow;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 
 import window.Launcher;
 
 public abstract class Block {
 
-	public int i = 4, j;
+	public int i = 4, j = 0;
 
 	int size = 3;
-	int type;
+	int type = 0;
 
 	public int[][] struct;
 
-	BufferedImage img;
+	Color col;
 
 	Launcher game;
 
 	Block(Launcher game, String block_name) {
 		this.game = game;
-		if (block_name == "S" || block_name == "J") {
-			img = Launcher.col1;
+		if (block_name == "S") {
 			this.type = 1;
+			col = green;
 		}
-		if (block_name == "Z" || block_name == "L") {
-			img = Launcher.col2;
+		if (block_name == "Z") {
 			this.type = 2;
+			col = red;
 		}
-		if (block_name == "I" || block_name == "T" || block_name == "O") {
-			img = Launcher.col3;
+		if (block_name == "I") {
 			this.type = 3;
+			col = skyblue;
+		}
+		if (block_name == "J") {
+			this.type = 4;
+			col = blue;
+		}
+		if (block_name == "L") {
+			this.type = 5;
+			col = orange;
+		}
+		if (block_name == "T") {
+			this.type = 6;
+			col = purple;
+		}
+		if (block_name == "O") {
+			this.type = 7;
+			col = yellow;
 		}
 	}
 
+	abstract int[][] getOriginalStruct();
+	
 	public void update() {
 		if (isInBounds(struct)) {
 			j++;
@@ -58,7 +87,7 @@ public abstract class Block {
 		}
 	}
 
-	public boolean isHitting(int[][] struct) {
+	protected boolean isHitting(int[][] struct) {
 		for (int j = 0; j < struct.length; j++) {
 			for (int i = 0; i < struct[0].length; i++) {
 				if (struct[j][i] == 1) {
@@ -73,7 +102,7 @@ public abstract class Block {
 		return false;
 	}
 
-	public boolean isInBounds(int[][] struct) {
+	protected boolean isInBounds(int[][] struct) {
 		for (int j = 0; j < struct.length; j++) {
 			for (int i = 0; i < struct[0].length; i++) {
 				if (struct[j][i] == 1) {
@@ -88,7 +117,9 @@ public abstract class Block {
 		return true;
 	}
 
-	public void placeTheBlock() {
+	int continuous = 0;
+
+	protected void placeTheBlock() {
 		for (int j = 0; j < struct.length; j++) {
 			for (int i = 0; i < struct[0].length; i++) {
 				if (struct[j][i] == 1) {
@@ -98,10 +129,27 @@ public abstract class Block {
 				}
 			}
 		}
-		removeTheLine();
+		removeTheLines();
+		if (continuous == 1) {
+			SCORE += line1;
+		}
+		if (continuous == 2) {
+			SCORE += line2;
+		}
+		if (continuous == 3) {
+			SCORE += line3;
+		}
+		if (continuous == 4) {
+			SCORE += line4;
+		}
+		if(SCORE > TOP_SCORE) {
+			TOP_SCORE = SCORE;
+			Launcher.writeScore();
+		}
+		Launcher.canHold = true;
 	}
 
-	public void removeTheLine() {
+	private void removeTheLines() {
 		for (int j = rows - 1; j >= 0; j--) {
 			int same = 0;
 			for (int i = 0; i < cols; i++) {
@@ -111,11 +159,12 @@ public abstract class Block {
 			}
 			if (same == cols) {
 				removeRow(j);
+				continuous++;
 			}
 		}
 	}
 
-	public void removeRow(int row) {
+	private void removeRow(int row) {
 		// remove row and then shift down
 		for (int i = 0; i < cols; i++) {
 			Launcher.board[row][i] = 0;
@@ -127,7 +176,7 @@ public abstract class Block {
 				Launcher.board[j - 1][i] = curr;
 			}
 		}
-		removeTheLine();
+		removeTheLines();
 	}
 
 	public void goLeft() {
@@ -161,16 +210,23 @@ public abstract class Block {
 	}
 
 	public void render(Graphics2D g, int ox, int oy) {
-		g.setStroke(new BasicStroke(1.5f));
-		g.setColor(Color.black);
+		g.setColor(col);
 		for (int j = 0; j < struct.length; j++) {
 			for (int i = 0; i < struct[0].length; i++) {
 				if (struct[j][i] == 1) {
-					g.drawImage(img, ox + i * W + this.i * W, oy + j * W + this.j * W, W, W, null);
-					g.drawRect(ox + i * W + this.i * W, oy + j * W + this.j * W, W, W);
+					int x = ox + i * W + this.i * W;
+					int y = oy + j * W + this.j * W;
+					g.fillRect(x, y, W + 1, W + 1);
 				}
 			}
 		}
+	}
+	
+
+	public void reset() {
+		i = 4;
+		j = 0;
+		struct = getOriginalStruct();
 	}
 
 }

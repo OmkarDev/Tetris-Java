@@ -2,15 +2,11 @@ package window;
 
 import java.awt.Canvas;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
-import java.net.URL;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.UIManager;
 
 public abstract class Window extends Canvas implements Runnable {
 
@@ -30,7 +26,7 @@ public abstract class Window extends Canvas implements Runnable {
 		frame = new JFrame();
 		setFocusable(true);
 		requestFocus();
-//		WIN_CLASS();
+		WIN_CLASS();
 	}
 
 	public void WIN_CLASS() {
@@ -90,29 +86,11 @@ public abstract class Window extends Canvas implements Runnable {
 		g.dispose();
 		bs.show();
 	}
-
-	public void applyLookAndFeel() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void setIcon(String path) {
-		try {
-			URL url = getClass().getResource("/" + path);
-			Image imgicon = ImageIO.read(url);
-			frame.setIconImage(imgicon);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	public void display() {
 		frame.add(this);
 		frame.pack();
-		frame.setSize(width + frame.getInsets().left + frame.getInsets().right, height + frame.getInsets().top + frame.getInsets().bottom);
+		frame.setSize(width, height + frame.getInsets().top + frame.getInsets().bottom);
 		frame.setTitle(title);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
