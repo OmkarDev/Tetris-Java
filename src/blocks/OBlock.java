@@ -11,7 +11,12 @@ public class OBlock extends Block {
 		this.struct = this.original_struct;
 	}
 
-	public void rotate() {
+	public void rotateRight() {
+		
+	}
+	
+	public void rotateLeft() {
+		
 	}
 	
 	int[][] getOriginalStruct() {

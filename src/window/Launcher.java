@@ -51,7 +51,7 @@ public class Launcher extends Window implements KeyListener {
 	public Block nextBlock;
 	public Block holdingBlock;
 
-	public static int[][] board = new int[20][10];
+	public static int[][] board;
 
 	public static BufferedImage frame;
 
@@ -68,11 +68,18 @@ public class Launcher extends Window implements KeyListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		reset();
+	}
+
+	public void reset() {
 		now = Instant.now();
+		board = new int[20][10];
 		nextBlock = getRandomBlock();
 		getNewBlock();
 
 		TOP_SCORE = getScore();
+		canHold = true;
+		holdingBlock = null;
 	}
 
 	public Block getRandomBlock() {
@@ -178,7 +185,13 @@ public class Launcher extends Window implements KeyListener {
 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP) {
-			block.rotate();
+			block.rotateRight();
+		}
+		if (e.getKeyCode() == KeyEvent.VK_Z) {
+			block.rotateLeft();
+		}
+		if (e.getKeyCode() == KeyEvent.VK_R) {
+			reset();
 		}
 		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 			block.goLeft();
@@ -235,7 +248,7 @@ public class Launcher extends Window implements KeyListener {
 	public int getScore() {
 		int score = 0;
 		File file = new File("top.txt");
-		if(!file.exists()) {
+		if (!file.exists()) {
 			try {
 				file.createNewFile();
 				TOP_SCORE = 0;

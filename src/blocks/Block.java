@@ -193,11 +193,27 @@ public abstract class Block {
 		}
 	}
 
-	public void rotate() {
+	public void rotateRight() {
 		int[][] struct = new int[size][size];
 		for (int i = 0; i < size; i++) {
 			for (int j = size - 1; j >= 0; j--) {
 				struct[i][Math.abs(j - (size - 1))] = this.struct[j][i];
+			}
+		}
+		if (!isInBounds(struct)) {
+			return;
+		}
+		if (isHitting(struct)) {
+			return;
+		}
+		this.struct = struct;
+	}
+	
+	public void rotateLeft() {
+		int[][] struct = new int[size][size];
+		for (int i = 0; i < size; i++) {
+			for (int j = size - 1; j >= 0; j--) {
+				struct[Math.abs(i - (size - 1))][j] = this.struct[j][i];
 			}
 		}
 		if (!isInBounds(struct)) {
