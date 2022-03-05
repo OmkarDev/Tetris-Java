@@ -57,6 +57,8 @@ public class Launcher extends Window implements KeyListener {
 
 	public static boolean canHold = true;
 
+	public static boolean hardDrop = false;
+
 	Font font;
 
 	public Launcher(int width, int height, String title) {
@@ -107,9 +109,12 @@ public class Launcher extends Window implements KeyListener {
 
 	public void update() {
 		later = Instant.now();
-		if (Duration.between(now, later).toMillis() >= speed) {
+		if (Duration.between(now, later).toMillis() >= speed && !hardDrop) {
 			block.update();
 			now = Instant.now();
+		}
+		if (hardDrop) {
+			block.update();;
 		}
 	}
 
@@ -184,25 +189,30 @@ public class Launcher extends Window implements KeyListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		if (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP) {
-			block.rotateRight();
+		if (e.getKeyCode() == KeyEvent.VK_UP) {
+			if (!hardDrop) {
+				block.rotateRight();
+			}
 		}
-		if (e.getKeyCode() == KeyEvent.VK_Z) {
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			hardDrop = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_Z && !hardDrop) {
 			block.rotateLeft();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_R) {
+		if (e.getKeyCode() == KeyEvent.VK_R && !hardDrop) {
 			reset();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+		if (e.getKeyCode() == KeyEvent.VK_LEFT && !hardDrop) {
 			block.goLeft();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT && !hardDrop) {
 			block.goRight();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+		if (e.getKeyCode() == KeyEvent.VK_DOWN && !hardDrop) {
 			speed = max_speed;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_C) {
+		if (e.getKeyCode() == KeyEvent.VK_C && !hardDrop) {
 			if (holdingBlock == null) {
 				Block currentBlock = block;
 				currentBlock.reset();

@@ -68,7 +68,7 @@ public abstract class Block {
 	}
 
 	abstract int[][] getOriginalStruct();
-	
+
 	public void update() {
 		if (isInBounds(struct)) {
 			j++;
@@ -142,11 +142,12 @@ public abstract class Block {
 		if (continuous == 4) {
 			SCORE += line4;
 		}
-		if(SCORE > TOP_SCORE) {
+		if (SCORE > TOP_SCORE) {
 			TOP_SCORE = SCORE;
 			Launcher.writeScore();
 		}
 		Launcher.canHold = true;
+		Launcher.hardDrop = false;
 	}
 
 	private void removeTheLines() {
@@ -208,7 +209,7 @@ public abstract class Block {
 		}
 		this.struct = struct;
 	}
-	
+
 	public void rotateLeft() {
 		int[][] struct = new int[size][size];
 		for (int i = 0; i < size; i++) {
@@ -237,7 +238,6 @@ public abstract class Block {
 			}
 		}
 	}
-	
 
 	public void reset() {
 		i = 4;

@@ -15,7 +15,7 @@ public abstract class Window extends Canvas implements Runnable {
 	public int width, height;
 	protected static String title;
 	public static JFrame frame;
-	private int fps = 30;
+	private int fps = 60;
 	public Thread thread;
 	boolean running = true;
 
@@ -26,7 +26,7 @@ public abstract class Window extends Canvas implements Runnable {
 		frame = new JFrame();
 		setFocusable(true);
 		requestFocus();
-		WIN_CLASS();
+//		WIN_CLASS();
 	}
 
 	public void WIN_CLASS() {
